@@ -1,9 +1,12 @@
 const express = require('express');
 const app = express();
 const PORT = 3000;
+const router = require('./routes/apiRouter.js');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use('/api', router);
 
 //404 Error 
 app.use('*', (req, res) => {
