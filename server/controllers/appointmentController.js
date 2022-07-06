@@ -2,21 +2,6 @@ const pg = require('../models/dbModel.js');
 
 
 const appointment = {};
-/*
-An example web UI that would be built on top of this backend is shown below. Doctors should
-have a unique ID, a first name, and a last name. Appointments should have a unique ID,
-patient first name, patient last name, date & time, and kind (New Patient or Follow-up). The
-backend must respond to HTTP requests (ie GET, POST, DELETE).
-
-● Get a list of all doctors
-● Get a list of all appointments for a particular doctor and particular day
-● Delete an existing appointment from a doctor's calendar
-● Add a new appointment to a doctor's calendar
-○ New appointments can only start at 15 minute intervals (ie, 8:15AM is a valid time
-but 8:20AM is not)
-○ A doctor can have multiple appointments with the same time, but no more than 3
-appointments can be added with the same time for a given doctor
-*/
 
 //get list of all doctors
 appointment.listOfDoctors = (req, res, next) => {
@@ -70,11 +55,6 @@ appointment.deleteAppointment = (req, res, next) => {
       next(err)
     })
 };
-// ● Add a new appointment to a doctor's calendar
-// ○ New appointments can only start at 15 minute intervals (ie, 8:15AM is a valid time
-// but 8:20AM is not)
-// ○ A doctor can have multiple appointments with the same time, but no more than 3
-// appointments can be added with the same time for a given doctor
 
 appointment.addAppointment = async (req, res, next) => {
 //Need doctor id
@@ -87,7 +67,7 @@ if(!valid){
 }
 
 const doctorAvailibility = await checkConflictingAppointments(id, date, time);
-console.log('doctor avail', doctorAvailibility)
+
 
 //Need to query doctor appoints for same date and time, if greater than 3, return error
 if(doctorAvailibility){
@@ -102,7 +82,7 @@ if(doctorAvailibility){
       return next(err)
     }) 
   }
-  
+
   else{
     return next('Doctor is booked')
   }
@@ -117,7 +97,6 @@ function checkConflictingAppointments(doctorid, date, time) {
 
   return pg.query(queryString, [doctorid, date, time])
     .then((data) => {
-      console.log('appointments', data.rows)
       if(data.rows.length >= 3) return false
       return true
     })
