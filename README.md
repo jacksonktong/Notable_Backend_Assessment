@@ -19,7 +19,7 @@ POST:
 - /appointments - Frontend sends doctorid (int), firstname (string), lastname (string), date(YYYY-MM-DD), time(string: 1:00PM, 11:00AM, etc...), type (string) - Adds a new appointment to the doctor's calendar, 15 min intervals, no more than 3 for same date & time
 
 PATCH:
-
+- /appointments - Frontend sends appointmentId (int), date(YYYY-MM-DD) and time (string: 1:00PM, 11:00AM...). Updates existing appointment with contraints to 15 min intervals and no more than 3 for same date and time.
 
 DELETE:
 - /doctors - Frontend sends appointment id (int) - Deletes existing appointment
