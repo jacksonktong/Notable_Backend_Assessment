@@ -23,7 +23,7 @@ appointment.listOfDoctors = (req, res, next) => {
 //Get a list of all appointments for a particular doctor and particular day
 //FE: send doctor id, date
 appointment.allAppointmentsOfDoctor = (req, res, next) => {
-  const { id, date } = req.body;
+  const { id, date } = req.query;
   const queryString = 
   `SELECT *
    FROM appointments
@@ -88,6 +88,49 @@ if(doctorAvailibility){
   }
   
 };
+
+appointment.updateAppointmentTime = async (req, res, next) => {
+  //Need appointmentid and new time
+  const { appointmentId, date, time} = req.body;
+  const minutes = parseInt(time.slice(-4, -2));
+  const valid = minutes % 15 === 0;
+
+  if(!valid) return next ('Time must be in 15mins intervals')
+  
+  const doctorId = await getDoctorId(appointmentId);
+  const doctorAvailibility = await checkConflictingAppointments(doctorId, date, time);
+
+  if(doctorAvailibility){
+    const queryString =
+    `UPDATE appointments
+    SET date = $1, time = $2
+    WHERE id = $3
+    `
+
+    pg.query(queryString, [date, time, appointmentId])
+      .then(()=> next())
+      .catch(()=> next('Error in updating appointments'))
+
+  }
+
+}
+
+function getDoctorId(appointmentid){
+  const  queryString = 
+  `SELECT doctorid
+  FROM appointments
+  WHERE id = $1
+  `
+
+  pg.query(queryString, [appointmentid])
+    .then((data)=> {
+      return data.rows[0]
+    })
+    .catch((err)=> {
+      console.error('Error in query:', err)
+    })
+
+}
 
 function checkConflictingAppointments(doctorid, date, time) {
   const queryString = 
